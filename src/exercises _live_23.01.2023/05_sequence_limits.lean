@@ -61,7 +61,13 @@ variables (u v w : ℕ → ℝ) (l l' : ℝ)
 -- 0033
 example : (∀ n, u n = l) → seq_limit u l :=
 begin
-  sorry
+  intros hn x hx,
+  use 0,
+  intros n ng, 
+  specialize hn n,
+  rw hn,
+  norm_num,
+  linarith,
 end
 
 /- When dealing with absolute values, we'll use lemmas:
@@ -80,7 +86,16 @@ hand since they are used in many exercises.
 -- 0034
 example (hl : l > 0) : seq_limit u l → ∃ N, ∀ n ≥ N, u n ≥ l/2 :=
 begin
-  sorry
+  intro h,
+  unfold seq_limit at h,
+  specialize h (l/2) (by linarith),
+  cases h with N hN,
+  use N,
+  intros n HN,
+  specialize hN n HN,
+  rw abs_le at hN,
+  cases hN with hN₁ hN₂,
+  linarith,
 end
 
 /- 
@@ -151,8 +166,34 @@ example (hu : seq_limit u l) (hw : seq_limit w l)
 (h : ∀ n, u n ≤ v n)
 (h' : ∀ n, v n ≤ w n) : seq_limit v l :=
 begin
-  sorry
-
+  intros ε ε_pos,
+  cases hu ε ε_pos with N₁ hN₁,
+  cases hw ε ε_pos with N₂ hN₂,
+  use max N₁ N₂,
+  intros n hn,
+  have fact₁ : n ≥ N₁,
+  { rw ge_max_iff at hn,
+  exact hn.left,},
+  have fact₂  : n ≥ N₂,
+  { rw ge_max_iff at hn,
+  exact hn.right,},
+  specialize hN₁ n fact₁,
+  specialize hN₂ n fact₂,
+  rw abs_le,
+  specialize h n,
+  specialize h' n,
+  split,
+  rw abs_le at hN₁,
+  have fact : u n - l ≤ v n - l,
+  { by linarith,},
+  calc -ε ≤ u n - l : hN₁.left 
+   ... ≤ v n - l : fact,
+  rw abs_le at hN₂,
+  have fact : v n - l ≤ w n - l,
+  { by linarith, },
+  calc v n - l ≤ w n - l : fact
+  ... ≤ ε : hN₂.right,
+  ---god I'm so sorry Professor Buzzard that's probably the worst proof ever written in lean
 end
 
 /- What about < ε? -/
@@ -160,7 +201,19 @@ end
 example (u l) : seq_limit u l ↔
  ∀ ε > 0, ∃ N, ∀ n ≥ N, |u n - l| < ε :=
 begin
-  sorry
+  split,
+  { intros a ε hε,
+  cases a (ε/2) (by linarith) with N hN,
+  use N,
+  intros n hn,
+  specialize hN n hn,
+  linarith, },
+  { intros a ε hε,
+  cases a ε hε with N hN,
+  use N,
+  intros n hn,
+  specialize hN n hn,
+  linarith, },
 end
 
 /- In the next exercise, we'll use
@@ -172,7 +225,39 @@ eq_of_abs_sub_le_all (x y : ℝ) : (∀ ε > 0, |x - y| ≤ ε) → x = y
 -- 0037
 example : seq_limit u l → seq_limit u l' → l = l' :=
 begin
-  sorry
+  intros a b,
+  apply eq_of_abs_sub_le_all l l',
+  intros ε hε,
+  cases a (ε/2) (by linarith) with N₁ hN₁,
+  cases b (ε/2) (by linarith) with N₂ hN₂,
+  have fact : N₁ ≤ max N₁ N₂,
+  { exact le_max_left N₁ N₂, },
+  have fact₂ : max N₁ N₂ ≥ N₁,
+  { linarith, },
+  specialize hN₁ (max N₁ N₂) (fact₂),
+  have fact₃ : N₂ ≤ max N₁ N₂,
+  { exact le_max_right N₁ N₂, },
+  have fact₄ : max N₁ N₂ ≥ N₂,
+  { linarith, },
+  specialize hN₂ (max N₁ N₂) (fact₄),
+  rw abs_le at hN₁,
+  rw abs_le at hN₂,
+  have obvious : -(ε/2) + -(ε/2) ≤ -(ε/2) + (u (max N₁ N₂) - l'),
+  { linarith, },
+  have left : -ε ≤ l - l',
+  { calc - ε = -(ε/2) + -(ε/2) : by ring
+  ... ≤ -(ε/2) + (u (max N₁ N₂) - l') : obvious
+  ... ≤ l - l' : by linarith, },
+  have trivial : (ε/2) + (u (max N₁ N₂) - l') ≤ (ε/2) + (ε/2),
+  { linarith, },
+  have right : l - l' ≤ ε, 
+  { calc l - l' ≤ (ε/2) + (u (max N₁ N₂) - l') : by linarith
+  ... ≤ (ε/2) + (ε/2) : trivial
+  ... ≤ ε : by ring_nf, },
+  rw abs_le,
+  split,
+  linarith,
+  exact right,
 end
 
 /-
@@ -189,5 +274,9 @@ example (M : ℝ) (h : is_seq_sup M u) (h' : non_decreasing u) :
 seq_limit u M :=
 begin
   sorry
+  --unfold seq_limit,
+  --unfold is_seq_sup at h,
+  --unfold non_decreasing at h',
+  --intros ε hε,
 end
 

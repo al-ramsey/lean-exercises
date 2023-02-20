@@ -245,8 +245,7 @@ begin
   have key₃ : (a - b)*c = a*c - b*c,
   { ring },
   rw key₃ at key₂,
-  rw ← sub_nonneg,
-  exact key₂,   
+  rwa ← sub_nonneg, 
 end
 
 /-- Using a combination of both, with a `calc` block -/
@@ -261,8 +260,7 @@ begin
   exact hc,
   have key₂ : (a - b)* c = a*c - b*c,
   { ring },
-  rw ← key₂,
-  exact key,
+  rwa ← key₂,
 end
 
 /-
@@ -413,13 +411,10 @@ an equivalence into two implications.
 example (P Q R : Prop) : (P ∧ Q → R) ↔ (P → (Q → R)) :=
 begin
   split,
-  intros a b c,
-  exact a ⟨b, c⟩,
-  intros a b,
-  cases b with ba bb,
-  apply a,
-  exact ba,
-  exact bb,
+  { intros a b c,
+  exact a ⟨b, c⟩, },
+  { rintros hyp ⟨a, b⟩,
+  exact hyp a b, },
 end
 
 /-
