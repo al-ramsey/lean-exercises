@@ -193,7 +193,6 @@ begin
   { by linarith, },
   calc v n - l ≤ w n - l : fact
   ... ≤ ε : hN₂.right,
-  ---god I'm so sorry Professor Buzzard that's probably the worst proof ever written in lean
 end
 
 /- What about < ε? -/
