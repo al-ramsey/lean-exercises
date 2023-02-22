@@ -1,6 +1,6 @@
 # lean-tutorials
 
-Exercises and files downloaded from: https://github.com/leanprover-community/tutorials. Changes are simply me adding my solutions to the exercises.
+Exercises and files downloaded from: https://github.com/leanprover-community/tutorials. Changes are simply me adding my solutions to the exercises. Most recent solutions are in exercises_live_23.01.2023.
 
 Original README:
 
