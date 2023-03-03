@@ -1,5 +1,9 @@
 # lean-tutorials
 
+Exercises and files downloaded from: https://github.com/leanprover-community/tutorials. Changes are simply me adding my solutions to the exercises. Most recent solutions are in src/exercises_live_23.01.2023.
+
+Original README:
+
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/leanprover-community/tutorials)
 
 The goal of this project is to quickly teach you how to use Lean 3 for
