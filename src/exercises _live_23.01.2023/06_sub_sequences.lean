@@ -52,7 +52,13 @@ inputs. -/
 -- 0039
 lemma extraction_ge : extraction φ → ∀ N N', ∃ n ≥ N', φ n ≥ N :=
 begin
-  sorry
+  intros hyp N N',
+  unfold extraction at hyp,
+  use max N N',
+  split,
+  { exact le_max_right N N', },
+  calc N ≤ max N N' : le_max_left N N'
+  ... ≤ φ (max N N') : by apply id_le_extraction hyp,
 end
 
 /-- A real number `a` is a cluster point of a sequence `u` 
