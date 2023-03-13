@@ -142,7 +142,23 @@ def cauchy_sequence (u : ℕ → ℝ) := ∀ ε > 0, ∃ N, ∀ p q, p ≥ N →
 -- 0043
 example : (∃ l, seq_limit u l) → cauchy_sequence u :=
 begin
-  sorry
+  intros h ε ε_pos,
+  unfold seq_limit at h,
+  cases h with l hl,
+  specialize hl (ε/2) (by linarith),
+  cases hl with N hN,
+  use N,
+  intros p q hp hq,
+  have key : |l - u q| = |u q - l|,
+  {exact abs_sub_comm l (u q),},
+  have key2 : |u p - l| ≤ ε/2,
+  {exact hN p hp,},
+  have key3 : |u q - l| ≤ ε/2,
+  {exact hN q hq,},
+  calc |u p - u q| = |(u p - l) + (l - u q)| : by ring_nf
+  ... ≤ |u p - l| + |l - u q| : abs_add (u p - l) (l - u q)
+  ... ≤ ε/2 + ε/2 : by linarith
+  ... ≤ ε : by ring_nf,
 end
 
 
@@ -153,6 +169,25 @@ In the next exercise, you can reuse
 -- 0044
 example (hu : cauchy_sequence u) (hl : cluster_point u l) : seq_limit u l :=
 begin
-  sorry
+  unfold seq_limit,
+  intros ε ε_pos,
+  unfold cauchy_sequence at hu,
+  have key : ∀ ε > 0, ∀ N, ∃ n ≥ N, |u n - l| ≤ ε,
+  {exact near_cluster hl,},
+  specialize hu (ε/2) (by linarith),
+  specialize key (ε/2) (by linarith),
+  cases hu with N hN,
+  specialize key N,
+  cases key with n hn,
+  cases hn with hnN,
+  use N,
+  intros i hi,
+  specialize hN i n,
+  have key2 : |u i - u n| ≤ ε/2,
+  { exact hN hi hnN,},
+  calc |u i - l| = |(u i - u n) + (u n - l)| : by ring_nf
+  ... ≤ |u i - u n| + |u n - l| : abs_add (u i - u n) (u n - l)
+  ... ≤ ε/2 + ε/2 : by linarith
+  ... ≤ ε : by ring_nf, 
 end
 
