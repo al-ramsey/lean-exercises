@@ -85,9 +85,24 @@ One gets used to it. Alternatively, one can get rid of it using the lemma
 lemma near_cluster :
   cluster_point u a → ∀ ε > 0, ∀ N, ∃ n ≥ N, |u n - a| ≤ ε :=
 begin
-  sorry
+  intros ha ε ε_pos N,
+  cases ha with φ hφ,
+  have rhφ : seq_limit (u ∘ φ) a,
+  { exact hφ.right, },
+  specialize rhφ ε ε_pos,
+  cases rhφ with N' hN',
+  specialize hN' (max N N'),
+  use (φ (max N N')),
+  split,
+  have ext : φ(max N N') ≥ max N N',
+  { exact id_le_extraction' hφ.left (max N N'),},
+  have key : max N N' ≥ N,
+  { exact le_max_left N N',},
+  linarith,
+  apply hN',
+  exact le_max_right N N',
 end
-
+-- :(
 /-
 The above exercice can be done in five lines. 
 Hint: you can use the anonymous constructor syntax when proving
@@ -99,14 +114,26 @@ existential statements.
 lemma subseq_tendsto_of_tendsto' (h : seq_limit u l) (hφ : extraction φ) :
 seq_limit (u ∘ φ) l :=
 begin
-  sorry
+  intros ε ε_pos,
+  specialize h ε ε_pos,
+  cases h with N hN,
+  use N,
+  intros n hn,
+  specialize hN (φ n),
+  apply hN,
+  have key : φ n ≥ n,
+  { exact id_le_extraction' hφ n,},
+  linarith,
 end
 
 /-- If `u` tends to `l` all its cluster points are equal to `l`. -/
 -- 0042
 lemma cluster_limit (hl : seq_limit u l) (ha : cluster_point u a) : a = l :=
 begin
-  sorry
+  cases ha with φ hφ,
+  have key : seq_limit (u ∘ φ ) l,
+  { exact subseq_tendsto_of_tendsto' hl hφ.left,},
+  exact unique_limit hφ.right key,
 end
 
 /-- Cauchy_sequence sequence -/
