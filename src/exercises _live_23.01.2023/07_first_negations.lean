@@ -49,13 +49,24 @@ open int
 -- 0045
 example (n : ℤ) (h_even : even n) (h_not_even : ¬ even n) : 0 = 1 :=
 begin
-  sorry
+  exfalso,
+  apply h_not_even,
+  exact h_even,
 end
 
 -- 0046
 example (P Q : Prop) (h₁ : P ∨ Q) (h₂ : ¬ (P ∧ Q)) : ¬ P ↔ Q :=
 begin
-  sorry
+  split,
+  intro h,
+  cases h₁ with a b,
+  exfalso,
+  apply h,
+  exact a,
+  exact b,
+  intros h ha,
+  apply h₂,
+  exact ⟨ha, h⟩, 
 end
 
 /-
@@ -120,7 +131,11 @@ non Q ⇒ non P.
 -- 0047
 example (P Q : Prop) (h : ¬ Q → ¬ P) : P → Q :=
 begin
-  sorry
+  intro hP,
+  by_contradiction H,
+  apply h,
+  exact H,
+  exact hP,
 end
 
 /-
@@ -142,7 +157,20 @@ In the next exercise, we'll use
 -- 0048
 example (n : ℤ) : even (n^2) ↔ even n :=
 begin
-  sorry
+  split,
+  contrapose,
+  intro h,
+  rw ← int.odd_iff_not_even,
+  rw ← int.odd_iff_not_even at h,
+  cases h with k hk,
+  use ((2)*(k^2) + 2*k),
+  rw hk,
+  ring,
+  intro h,
+  cases h with a ha,
+  use (2*(a^2)),
+  rw ha,
+  ring,
 end
 /-
 As a last step on our law of the excluded middle tour, let's notice that, especially
@@ -184,7 +212,26 @@ end
 -- 0049
 example : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q :=
 begin
-  sorry
+  split,
+  intro h,
+  by_cases hP : P,
+  right,
+  intro hQ,
+  apply h,
+  exact ⟨hP, hQ⟩,
+  left,
+  exact hP,
+  intro h,
+  by_cases hP : P,
+  intro hQ,
+  cases h with a b,
+  apply a,
+  exact hP,
+  apply b,
+  exact hQ.right,
+  intro hQ,
+  apply hP,
+  exact hQ.left,
 end
 
 /-
@@ -196,7 +243,16 @@ In the first exercise, only the definition of negation is needed.
 -- 0050
 example (n : ℤ) : ¬ (∃ k, n = 2*k) ↔ ∀ k, n ≠ 2*k :=
 begin
-  sorry
+  split,
+  intros h k hk,
+  apply h,
+  use k,
+  exact hk,
+  intros h hk,
+  cases hk with k ahk,
+  specialize h k,
+  apply h,
+  exact ahk,
 end
 
 /-
