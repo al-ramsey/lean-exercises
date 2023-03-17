@@ -268,7 +268,20 @@ def even_fun (f : ℝ → ℝ) := ∀ x, f (-x) = f x
 -- 0051
 example (f : ℝ → ℝ) : ¬ even_fun f ↔ ∃ x, f (-x) ≠ f x :=
 begin
-  sorry
+  split,
+  contrapose,
+  rw not_not,
+  intros h x,
+  by_contradiction H,
+  apply h,
+  use x,
+  contrapose,
+  rw not_not,
+  intros h hx,
+  cases hx with x Hx,
+  apply Hx,
+  specialize h x,
+  exact h,
 end
 
 /-
@@ -287,7 +300,15 @@ end
 -- 0052
 example (f : ℝ → ℝ) : ¬ even_fun f ↔ ∃ x, f (-x) ≠ f x :=
 begin
-  sorry
+  split,
+  intro h,
+  unfold even_fun at h,
+  push_neg at h,
+  exact h,
+  intro h,
+  unfold even_fun,
+  push_neg,
+  exact h,
 end
 
 def bounded_above (f : ℝ → ℝ) := ∃ M, ∀ x, f x ≤ M
@@ -305,7 +326,14 @@ end
 -- 0053
 example (x : ℝ) : (∀ ε > 0, x ≤ ε) → x ≤ 0 :=
 begin
-  sorry
+  contrapose,
+  intro ha,
+  push_neg,
+  push_neg at ha,
+  use (x/2),
+  split,
+  linarith,
+  linarith,
 end
 
 /-
@@ -319,6 +347,24 @@ Let's use this trick, together with:
 -- 0054
 example (f : ℝ → ℝ) : (∀ x y, x < y → f x < f y) ↔ (∀ x y, (x ≤ y ↔ f x ≤ f y)) :=
 begin
-  sorry
+  split,
+  intros h x y,
+  split,
+  intro hx,
+  have key : x = y ∨ x < y,
+  { exact eq_or_lt_of_le hx,},
+  cases key with key₁ key₂,
+  rw key₁,
+  have k : f x < f y,
+  { exact h x y key₂,},
+  linarith,
+  contrapose!,
+  exact h y x,
+  intros h x y,
+  contrapose!,
+  specialize h y x,
+  rw h,
+  intro ob,
+  exact ob,
 end
 
