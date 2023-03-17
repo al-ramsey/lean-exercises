@@ -22,13 +22,34 @@ variables P Q : Prop
 -- 0055
 example : (P → Q) ↔ (¬ Q → ¬ P) :=
 begin
-  sorry
+  split,
+  intros a b,
+  by_contradiction H,
+  apply b,
+  apply a,
+  exact H,
+  intros a b,
+  by_contradiction H,
+  apply a,
+  exact H,
+  exact b,
 end
 
 -- 0056
 lemma non_imp (P Q : Prop) : ¬ (P → Q) ↔ P ∧ ¬ Q :=
 begin
-  sorry
+  split,
+  intro h,
+  by_contradiction H,
+  apply h,
+  intro p,
+  by_contradiction HH,
+  apply H,
+  exact ⟨p, HH⟩,
+  intros h a,
+  apply h.right,
+  apply a,
+  exact h.left,
 end
 
 -- In the next one, let's use the axiom
@@ -37,7 +58,18 @@ end
 -- 0057
 example (P : Prop) : ¬ P ↔ P = false :=
 begin
-  sorry
+  split,
+  intro h,
+  apply propext,
+  split,
+  apply h,
+  intro f,
+  exfalso,
+  apply f,
+  intro h,
+  by_contradiction H,
+  rw ← h,
+  exact H,
 end
 
 end negation_prop
