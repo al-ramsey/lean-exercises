@@ -141,7 +141,15 @@ but we won't need this.
 example {A : set ℝ} {x : ℝ} (hx : is_sup A x) :
 ∀ y, y < x → ∃ a ∈ A, y < a :=
 begin
-  sorry
+  intros y hy,
+  cases hx with hxa hxb,
+  by_contradiction H,
+  push_neg at H,
+  specialize hxb y,
+  have key : x ≤ y,
+  { apply hxb,
+  exact H,},
+  linarith,
 end
 
 /-
@@ -153,13 +161,26 @@ exercise below.
 lemma le_of_le_add_all' {x y : ℝ} :
   (∀ ε > 0, y ≤ x + ε) →  y ≤ x :=
 begin
-  sorry
+  intro h,
+  by_contradiction H,
+  push_neg at H,
+  specialize h ((y-x)/2) (by linarith),
+  linarith,
 end
 
 -- 0070
 example {x y : ℝ} {u : ℕ → ℝ} (hu : seq_limit u x)
   (ineg : ∀ n, u n ≤ y) : x ≤ y :=
 begin
-  sorry
+  unfold seq_limit at hu,
+  apply le_of_le_add_all',
+  intros ε ε_pos,
+  specialize hu ε ε_pos,
+  cases hu with N hN,
+  specialize ineg N,
+  specialize hN N (by linarith),
+  rw abs_le at hN,
+  cases hN with lef righ,
+  linarith,
 end
 
