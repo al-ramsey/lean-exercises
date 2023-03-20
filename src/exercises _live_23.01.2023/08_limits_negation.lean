@@ -81,7 +81,15 @@ def tendsto_infinity (u : ℕ → ℝ) := ∀ A, ∃ N, ∀ n ≥ N, u n ≥ A
 -- 0066
 example {u : ℕ → ℝ} : tendsto_infinity u → ∀ l, ¬ seq_limit u l :=
 begin
-  sorry
+  intros ha l hc,
+  specialize hc 1 (by linarith),
+  specialize ha (2+l),
+  cases hc with N hN,
+  cases ha with N' hN',
+  specialize hN (max N N') (le_max_left N N'),
+  specialize hN' (max N N') (le_max_right N N'),
+  rw abs_le at hN,
+  linarith,
 end
 
 def nondecreasing_seq (u : ℕ → ℝ) := ∀ n m, n ≤ m → u n ≤ u m
