@@ -80,25 +80,71 @@ variables (X : Type) (P : X → Prop)
 -- 0058
 example : ¬ (∀ x, P x) ↔ ∃ x, ¬ P x :=
 begin
-  sorry
+  split,
+  intro h,
+  by_contradiction H,
+  apply h,
+  intro x,
+  by_contradiction HH,
+  apply H,
+  use x,
+  intro h,
+  by_contradiction H,
+  cases h with x hx,
+  specialize H x,
+  apply hx,
+  exact H,
 end
 
 -- 0059
 example : ¬ (∃ x, P x) ↔ ∀ x, ¬ P x :=
 begin
-  sorry
+  split,
+  intros h x hx,
+  apply h,
+  use x,
+  exact hx,
+  intros h hx,
+  cases hx with x hhx,
+  specialize h x,
+  apply h,
+  exact hhx,
 end
 
 -- 0060
 example (P : ℝ → Prop) : ¬ (∃ ε > 0, P ε) ↔ ∀ ε > 0, ¬ P ε :=
 begin
-  sorry
+  split,
+  intros h ε ε_pos hε,
+  apply h,
+  use ε,
+  exact ⟨ε_pos, hε⟩,
+  intros h hx,
+  cases hx with ε hh,
+  cases hh with ε_pos hε,
+  specialize h ε ε_pos,
+  apply h,
+  exact hε,
 end
 
 -- 0061
 example (P : ℝ → Prop) : ¬ (∀ x > 0, P x) ↔ ∃ x > 0, ¬ P x :=
 begin
-  sorry
+  split,
+  intro h,
+  by_contradiction H,
+  apply h,
+  intros x x_pos,
+  by_contradiction HH,
+  apply H,
+  use x,
+  exact ⟨x_pos, HH⟩,
+  intros h hx,
+  cases h with x hhx,
+  cases hhx with hxx hh,
+  specialize hx x hxx,
+  apply hh,
+  exact hx,
 end
 
 end negation_quantifiers
