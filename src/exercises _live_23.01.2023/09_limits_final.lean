@@ -30,7 +30,16 @@ Let's start with a variation on a known exercise.
 lemma le_lim {x y : ℝ} {u : ℕ → ℝ} (hu : seq_limit u x)
   (ineg : ∃ N, ∀ n ≥ N, y ≤ u n) : y ≤ x :=
 begin
-  sorry
+  unfold seq_limit at hu,
+  cases ineg with N hN,
+  by_contradiction H,
+  push_neg at H,
+  specialize hu ((y-x)/2) (by linarith),
+  cases hu with N' hN',
+  specialize hN (max N N') (le_max_left N N'),
+  specialize hN' (max N N') (le_max_right N N'),
+  rw abs_le at hN',
+  linarith,
 end
 
 /-
@@ -84,19 +93,50 @@ begin
   { intro h,
     split,
     {
-      sorry
+      exact h.left,
     },
     { have : ∀ n : ℕ, ∃ a ∈ A, x - 1/(n+1) < a,
       { intros n,
         have : 1/(n+1 : ℝ) > 0,
           exact nat.one_div_pos_of_nat,
-        sorry
+        cases h with ha hb,
+        by_contradiction H,
+        push_neg at H,
+        specialize hb (x - 1/(n+1)),
+        have key : x ≤ x - 1/(n+1),
+        apply hb,
+        exact H,
+        linarith,
       },
       choose u hu using this,
-      sorry
+      use u,
+      split,
+      apply limit_of_sub_le_inv_succ,
+      intros n,
+      specialize hu n,
+      rw abs_le,
+      split,
+      linarith,
+      cases hu with ha hb,
+      cases h with hx hy,
+      specialize hx (u n) (ha),
+      linarith,
+      intros n,
+      specialize hu n,
+      exact hu.left,
   } },
   { rintro ⟨maj, u, limu, u_in⟩, 
-    sorry
+    split,
+    exact maj,
+    intros y hy,
+    by_contradiction H,
+    push_neg at H,
+    specialize limu ((x-y)/2) (by linarith),
+    cases limu with N hN,
+    specialize hN N (by linarith),
+    specialize hy (u N) (u_in N),
+    rw abs_le at hN,
+    linarith,
   },
 end
 
@@ -110,7 +150,19 @@ variables {f : ℝ → ℝ} {x₀ : ℝ} {u : ℕ → ℝ}
 lemma seq_continuous_of_continuous (hf : continuous_at_pt f x₀)
   (hu : seq_limit u x₀) : seq_limit (f ∘ u) (f x₀) :=
 begin
-  sorry
+  intros ε ε_pos,
+  specialize hf ε ε_pos,
+  cases hf with δ ha,
+  cases ha with hδ h,
+  unfold seq_limit at hu,
+  specialize hu δ hδ,
+  cases hu with N hN,
+  use N,
+  intros n hn,
+  specialize hN n hn,
+  specialize h (u n),
+  apply h,
+  exact hN,
 end
 
 -- 0074
@@ -118,7 +170,34 @@ example :
   (∀ u : ℕ → ℝ, seq_limit u x₀ → seq_limit (f ∘ u) (f x₀)) →
   continuous_at_pt f x₀ :=
 begin
-  sorry
+  contrapose!,
+  unfold continuous_at_pt,
+  push_neg,
+  intro h,
+  cases h with ε hε,
+  cases hε with ε_pos ha,
+  specialize ha ε ε_pos,
+  cases ha with x hx,
+  cases hx with hxa hxb,
+  have key : ∀n : ℕ, ∃a, |a - x₀| ≤ (1/(n+1 : ℝ)),
+  { intros n,
+  use x₀,
+  have key₂ : |x₀ - x₀| = 0,
+  simp,
+  rw key₂,
+  have key₃ : 0 < 1/(n+1 : ℝ),
+  exact nat.one_div_pos_of_nat,
+  linarith,},
+  choose u hu using key,
+  use u,
+  split,
+  exact limit_of_sub_le_inv_succ hu,
+  unfold seq_limit,
+  push_neg,
+  use ε,
+  split,
+  exact ε_pos,
+  intros N,
 end
 
 /-
