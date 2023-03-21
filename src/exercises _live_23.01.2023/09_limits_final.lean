@@ -170,7 +170,8 @@ example :
   (∀ u : ℕ → ℝ, seq_limit u x₀ → seq_limit (f ∘ u) (f x₀)) →
   continuous_at_pt f x₀ :=
 begin
-  contrapose!,
+  sorry
+  /-contrapose!,
   unfold continuous_at_pt,
   push_neg,
   intro h,
@@ -197,7 +198,7 @@ begin
   use ε,
   split,
   exact ε_pos,
-  intros N,
+  intros N,-/
 end
 
 /-
