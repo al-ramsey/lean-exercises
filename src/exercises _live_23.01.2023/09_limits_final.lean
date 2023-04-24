@@ -235,14 +235,28 @@ lemma subseq_tendstoinfinity
   (h : tendsto_infinity u) (hφ : extraction φ) :
 tendsto_infinity (u ∘ φ) :=
 begin
-  sorry
+  intro A,
+  specialize h A,
+  cases h with N hN,
+  use N,
+  intros n hn,
+  apply hN,
+  calc N ≤ n : hn 
+  ... ≤ φ n : id_le_extraction hφ n,
 end
 
 -- 0076
 lemma squeeze_infinity {u v : ℕ → ℝ} (hu : tendsto_infinity u)
 (huv : ∀ n, u n ≤ v n) : tendsto_infinity v :=
 begin
-  sorry
+  intros A,
+  specialize hu A,
+  cases hu with N hN,
+  use N,
+  intros n hn,
+  specialize hN n hn,
+  calc A ≤ u n : hN
+  ... ≤ v n : huv n,
 end
 
 /-
