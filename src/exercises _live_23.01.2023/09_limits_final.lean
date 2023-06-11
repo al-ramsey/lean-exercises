@@ -350,7 +350,16 @@ Now let's combine the two exercises above
 lemma bdd_below_segment {f : ℝ → ℝ} {a b : ℝ} (hf : ∀ x ∈ Icc a b, continuous_at_pt f x) :
 ∃ m, ∀ x ∈ Icc a b, m ≤ f x :=
 begin
-  sorry
+  have key :  ∃ M, ∀ x ∈ Icc a b, -f x ≤ M,
+  { apply bdd_above_segment,
+  intros x hx,
+  specialize hf x hx,
+  exact continuous_opposite hf,},
+  cases key with M hM,
+  use -M,
+  intros x hx,
+  specialize hM x hx,
+  linarith,
 end
 
 /-
