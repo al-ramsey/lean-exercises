@@ -280,7 +280,38 @@ open set
 lemma bdd_above_segment {f : ℝ → ℝ} {a b : ℝ} (hf : ∀ x ∈ Icc a b, continuous_at_pt f x) :
 ∃ M, ∀ x ∈ Icc a b, f x ≤ M :=
 begin
-  sorry
+  by_contradiction H,
+  push_neg at H,
+  have corr : ∀ n : ℕ, ∃ x, x ∈ Icc a b ∧ f x > n,
+  {intro n,
+  specialize H n,
+  exact H,},
+  choose u hu using corr,
+  have bol : ∃ c ∈ Icc a b, cluster_point u c,
+  {apply bolzano_weierstrass,
+  intro n,
+  specialize hu n,
+  exact hu.left,},
+  have inf : tendsto_infinity (f ∘ u),
+  {intro A,
+  apply squeeze_infinity seq_limit_id,
+  intro n,
+  specialize hu n,
+  linarith,},
+  cases bol with c hc,
+  cases hc with Hc hcc,
+  unfold cluster_point at hcc,
+  cases hcc with φ hφ,
+  specialize hf c Hc,
+  have inf2 : tendsto_infinity (f ∘ (u ∘ φ)),
+  { exact subseq_tendstoinfinity inf hφ.left,},
+  have f_lim : seq_limit (f ∘ u ∘ φ) (f c),
+  { exact seq_continuous_of_continuous hf hφ.right, },
+  have cont : ¬ seq_limit (f ∘ u ∘ φ) (f c),
+  { apply not_seq_limit_of_tendstoinfinity,
+  exact inf2, },
+  apply cont,
+  exact f_lim,
 end
 
 /-
@@ -293,7 +324,22 @@ In the next exercise, we can use:
 lemma continuous_opposite {f : ℝ → ℝ} {x₀ : ℝ} (h : continuous_at_pt f x₀) :
   continuous_at_pt (λ x, -f x) x₀ :=
 begin
-  sorry
+  unfold continuous_at_pt,
+  intros ε ε_pos,
+  unfold continuous_at_pt at h,
+  specialize h ε ε_pos,
+  cases h with δ hδ,
+  cases hδ with δ_pos Hδ,
+  use δ,
+  split,
+  exact δ_pos,
+  intros x hx,
+  specialize Hδ x hx,
+  have key : -f x - -f x₀ = -(f x - f x₀),
+  { ring,},
+  rw key,
+  rw abs_neg,
+  exact Hδ,
 end
 
 /-
